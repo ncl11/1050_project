@@ -33,7 +33,7 @@ def page_header():
                                                 'paddingLeft': '4px', 'color': '#a3a7b0',
                                                 'textDecoration': 'none'})],
                className="two columns row",
-               href='https://github.com/vidushi-shukla/data1050-fall2020-RINV'),
+               href='https://github.com/ncl11/1050_project'),
     ], className="row")
 
 
@@ -294,10 +294,11 @@ def architecture_summary():
             Load/Descriptor of Database Used -  Given the relatively small CSV files in our problem, we have elected not to host it on MongoDB. However, if the data files in question were larger, we would hope to use MongoDB to establish a database.  Furthermore, given the predictive model we ran, we found it easier to read CSV files locally into a pandas data frame. 
 
             Link to a static version of your ETL_EDA.ipynb notebook, or equivalent web page
-            https://github.com/vidushi-shukla/data1050-fall2020-RINV/blob/main/ETL_EDA%20-%20Copy.ipynb
+            https://github.com/ncl11/1050_project/blob/master/ETL_EDA.ipynb
+            https://github.com/ncl11/1050_project/blob/master/ETL_EDA2.ipynb
 
             Link to a static version of your Enhancement.ipynb notebook, or equivalent web page
-            https://github.com/vidushi-shukla/data1050-fall2020-RINV/blob/main/Enhancement.ipynb
+            https://github.com/ncl11/1050_project/blob/master/Enhancement.ipynb
 
 
 
