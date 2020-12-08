@@ -50,7 +50,7 @@ def description():
 
         Charting the Charts is a tool to utilize the potential predictive power of online trending data to predict future revenue trends for new movie releases.
         
-        The data used in this model is retrieved from two data sources. The BoxOfficeMojo data is scraped and the google trends data is available through gtab.  Our database updates automatically every monday with the previous week of data.  Unsurprisingly the most predictive variable for box office gross was the gross from the previous week.  This correlation can be seen below.
+        The data used in this model is retrieved from two data sources. The BoxOfficeMojo data is scraped and the Google Trends data is available through gtab.  Our database updates automatically every monday with the previous week of data.  Unsurprisingly the most predictive variable for box office gross was the gross from the previous week.  This correlation can be seen below.
 
         ''', className='eleven columns', style={'paddingLeft': '5%'})], className="row")
 
@@ -118,12 +118,60 @@ def description2():
     Returns overall project description in markdown
     """
     return html.Div(children=[dcc.Markdown('''
-    The correlation between google trend data and gross varies widely from week to week.  The data was highly correlated with the gross for some weeks and not strongly correlated for others.  This is largely dependent on the names of the highest grossing movies and if there is overlap with common search words on google.  Below is a stacked bar plot of the normalized Gross and Google trend data for the week beginning 11/16/20.  Some of the issues that arrise when using google trend data are discussed below in the 'Next Steps' section. 
+    The correlation between Google Trend data and gross varies widely from week to week.  The data was highly correlated with the gross for some weeks and not strongly correlated for others.  This is largely dependent on the names of the highest grossing movies and if there is overlap with common search words on Google.  Below are two stacked bar plots of the normalized Gross and Google Trend data for the week beginning 6/22/20 and the most current week respectively.  Some of the issues that arrise when using Google Trend data are discussed below in the 'Next Steps' section. 
 
         ''', className='eleven columns', style={'paddingLeft': '5%'})], className="row")
 
 def static_stacked_bar_graph(stack=False):
     df = pd.read_csv('6_mo_weekly.csv', sep='\t')
+    df['Date_dt'] = df['Date'].astype('datetime64[ns]')
+
+    date = df['Date_dt'].unique()[5]
+
+    fig = go.Figure()
+    sorted_df = df[df['Date_dt'] == date].sort_values(by=['Weekly'], ascending=False)[0:15][::-1]
+    y = sorted_df['Release']
+    x_rev = sorted_df['Weekly'] / np.sum(sorted_df['Weekly'])
+    x_trend = sorted_df['google trends'] / np.sum(sorted_df['google trends'])
+    trends, revenues = pd.Series(x_trend), pd.Series(x_rev)
+    corr = trends.corr(revenues)
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        y=y,
+        x=x_rev,
+        name='Gross',
+        orientation='h',
+        marker=dict(
+            color='blue', #rgba(246, 78, 139, 0.6)',
+            line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
+        )
+    ))
+    fig.add_trace(go.Bar(
+        y=y,
+        x=x_trend,
+        name='Google Trends',
+        orientation='h',
+        marker=dict(
+            color='red', #rgba(58, 71, 80, 0.6)',
+            line=dict(color='rgba(58, 71, 80, 1.0)', width=3)
+        )
+    ))
+    title = f'Normalized Gross and Google Trends for top Movies-Week Starting 6/22/2020: Correlation = {corr}'
+
+    #fig.update_layout(barmode='stack')
+    fig.update_layout(template='plotly_dark',
+                    title=title,
+                    plot_bgcolor='#23272c',
+                    paper_bgcolor='#23272c',
+                    yaxis_title='Movies',
+                    xaxis_title='Normalized Quantities',barmode='stack')
+
+
+    return fig
+    
+def static_stacked_bar_graph_current(stack=False):
+    df = pd.read_csv('3_mo_weekly.csv', sep='\t')
     df['Date_dt'] = df['Date'].astype('datetime64[ns]')
 
     date = df['Date_dt'].iloc[-1]
@@ -157,7 +205,7 @@ def static_stacked_bar_graph(stack=False):
             line=dict(color='rgba(58, 71, 80, 1.0)', width=3)
         )
     ))
-    title = f'Normalized Gross and Google Trends for top 15 Movies-Week Starting 11/16/20: Correlation = {corr}'
+    title = f'Normalized Gross and Google Trends for top 15 Movies-Most Recent Data: Correlation = {corr}'
 
     #fig.update_layout(barmode='stack')
     fig.update_layout(template='plotly_dark',
@@ -169,7 +217,7 @@ def static_stacked_bar_graph(stack=False):
 
 
     return fig
-    
+
 
 def what_if_description():
     """
@@ -217,16 +265,44 @@ def architecture_summary():
         dcc.Markdown('''
             # Possible next steps
 
-            In terms of next steps, we would hope to mitigate some of the biases that arise when using “google trends” as a predictor. Given the complexity of some movie titles, it is unlikely that people will search for these movies word for word. Instead, we would want to account for possible abbreviations and related searches for these movies. Conversely, some movie titles are also commonly used words/phrases. In these situations the google trend data underestimates and overestimates, respectively, the number of searches for the movie. If given more time, we would want to build a more robust model that lessens the effects of the aforementioned issues. 
+            In terms of next steps, we would hope to mitigate some of the biases that arise when using “Google Trends” as a predictor. Given the complexity of some movie titles, it is unlikely that people will search for these movies word for word. Instead, we would want to account for possible abbreviations and related searches for these movies. Conversely, some movie titles are also commonly used words/phrases. In these situations the Google Trend data underestimates and overestimates, respectively, the number of searches for the movie. If given more time, we would want to build a more robust model that lessens the effects of the aforementioned issues. 
 
-            In the future, if more time allows, one should look into different models beyond linear regression, which can provide additional confidence in the predictions. To improve the model approach, it would also be a good idea to incorporate more data besides just using previous week data to predict the next week. By adding in a previous two weeks of data we may have been able to achieve higher accuracy. 
- 
+            Ridge regression was very effective for our data but in the future we may look to more sophisticated hyperparameter tuning to see if we can improve the predictive power using other machine learning models.  To improve the model approach, it would also be a good idea to incorporate more data besides just using previous week data to predict the next week. By adding in a previous two weeks of data we may have been able to achieve higher accuracy. 
+
+            # Additional Information
+
+            ### Datasets Used 
+            We acquired data from the following sites:
+
+            * https://trends.google.com/trends/?geo=US 
+            * https://www.boxofficemojo.com/?ref_=bo_nb_da_mojologo
+            
+            We obtained daily searches from Google Trends and daily gross from BoxOfficeMojo and merged the two data sets on date and movie title.  Our dataset will be automatically updated at weekly intervals through rescraping BoxOfficeMojo and merging with the new Google Trends data. 
+
+            ### Development Process and Final Technology Stack
+
+            Our website was created and hosted through Gitpod. Given that Gitpod is powered by VS Code, the site was created accordingly. 
+
+            ### Data Acquisition, Caching, ETL Processing, Database Design
+
+            As mentioned above, we obtained daily searches from Google Trends and daily gross from BoxOfficeMojo and merged the two data sets on date and movie title. Please find our ETL steps below.
+
+            Extract - Data was extracted by scraping BoxOfficeMojo as well as Google Trends. 
+
+            Transform - Once the data was scraped, the resulting data frames were merged so that one data frame contained revenue and trend information for a specific movie. Data was cleansed, stripped of extraneous characters, and converted into workable types. 
+
+            Load/Descriptor of Database Used -  Given the relatively small CSV files in our problem, we have elected not to host it on MongoDB. However, if the data files in question were larger, we would hope to use MongoDB to establish a database.  Furthermore, given the predictive model we ran, we found it easier to read CSV files locally into a pandas data frame. 
+
+            Link to a static version of your ETL_EDA.ipynb notebook, or equivalent web page
+            https://github.com/vidushi-shukla/data1050-fall2020-RINV/blob/main/ETL_EDA%20-%20Copy.ipynb
+
+            Link to a static version of your Enhancement.ipynb notebook, or equivalent web page
+            https://github.com/vidushi-shukla/data1050-fall2020-RINV/blob/main/Enhancement.ipynb
+
+
+
         ''', className='row eleven columns', style={'paddingLeft': '5%'}),
 
-        html.Div(children=[
-            html.Img(src="https://docs.google.com/drawings/d/e/2PACX-1vQNerIIsLZU2zMdRhIl3ZZkDMIt7jhE_fjZ6ZxhnJ9bKe1emPcjI92lT5L7aZRYVhJgPZ7EURN0AqRh/pub?w=670&amp;h=457",
-                     className='row'),
-        ], className='row', style={'textAlign': 'center'}),
 
         dcc.Markdown('''
         
@@ -244,6 +320,7 @@ def dynamic_layout():
         dcc.Graph(id='stacked-trend-graph', figure=static_stacked_trend_graph(stack=True)),
         description2(), 
         dcc.Graph(id='stacked-trend-graph2', figure=static_stacked_bar_graph(stack=False)),
+        dcc.Graph(id='stacked-trend-graph3', figure=static_stacked_bar_graph_current(stack=False)),
         what_if_description(),
         what_if_tool(),
         architecture_summary(),
