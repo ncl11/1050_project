@@ -1,7 +1,7 @@
-# Energy Planner
-> DATA1050 Example Project Fall 20
+# Charting The Charts
 
+This app shows an interactive display of the top movies along with our prediction of gross for the upcoming week.
 
-https://docs.google.com/document/d/1uwpXgpEZpacViosYREnze5MGQFuVhMaRtYixxmIKXBU/edit#
+> DATA1050 Project
 
 # 1050_project
