@@ -7,7 +7,6 @@ from datetime import timedelta
 
 
 from model import train_model
-from database import fetch_all_bpa_as_df
 
 # Definitions of constants. This projects uses extra CSS stylesheet at `./assets/style.css`
 COLORS = ['rgb(67,67,67)', 'rgb(115,115,115)', 'rgb(49,130,189)', 'rgb(189,189,189)']
@@ -400,20 +399,6 @@ def what_if_handler(wind, hydro):
                       xaxis_title='Date/Time')
 
 
- #   """Changes the display graph of supply-demand"""
- #   df = fetch_all_bpa_as_df(allow_cached=True)
- #   x = df['Datetime']
- #   supply = df['Wind'] * wind + df['Hydro'] * hydro + df['Fossil/Biomass'] + df['Nuclear']
- #   load = df['Load']
-
- #   fig = go.Figure()
- #   fig.add_trace(go.Scatter(x=x, y=supply, mode='none', name='supply', line={'width': 2, 'color': 'pink'},
- #                 fill='tozeroy'))
- #   fig.add_trace(go.Scatter(x=x, y=load, mode='none', name='demand', line={'width': 2, 'color': 'orange'},
- #                 fill='tonexty'))
- #   fig.update_layout(template='plotly_dark', title='Supply/Demand after Power Scaling',
- #                     plot_bgcolor='#23272c', paper_bgcolor='#23272c', yaxis_title='MW',
- #                     xaxis_title='Date/Time')
     return fig
 
 
